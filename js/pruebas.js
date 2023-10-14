@@ -1,3 +1,4 @@
+//form cajero
 const formularioCajero = document.getElementById('formularioCajero')
 const numeroCuentaCajero = document.getElementById('numCuenta')
 const dniCuentaCajero = document.getElementById('dniCajero')
@@ -8,8 +9,8 @@ const templateCuentasRegistradas = document.getElementById('templateCuentasRegis
 const saveTemplateCuentas = document.getElementById('saveTemplateCuentas')
 const mensajeDeposito = document.getElementById('mensajeDeposito')
 const mensajeRetiro = document.getElementById('mensajeRetiro')
-//form persona 
 
+//form persona 
 
 const formularioPersona = document.getElementById('formularioPersona')
 const nombre = document.getElementById('nombrePersona')
@@ -21,11 +22,12 @@ const templatePersona = document.getElementById('templateRegistroPersona')
 const divRegistro = document.getElementById('personaRegistroTemplate')
 const fragment = document.createDocumentFragment()
 
-
 const regUserName = /^[A-Za-zÃ‘Ã±ÃÃ¡Ã‰Ã©ÃÃ­Ã“Ã³ÃšÃºÃœÃ¼\s]+$/;
-
 let arregloPersona = []
 let arregloCajero = []
+let cuentasLocal = []
+
+
 formularioPersona.addEventListener("submit", e => {
     e.preventDefault()
     const ui = new UI()
@@ -39,18 +41,17 @@ formularioPersona.addEventListener("submit", e => {
     arregloPersona.push(persona)
     ui.pintarMensajeRegistro(persona)
 
+    localStorage.setItem("cuentas", JSON.stringify(arregloPersona))
 
     const cajero = new CajeroAutomatico()
-
     cajero.almacenaCliente(persona)
 
- 
-        numeroCuentaCajero.disabled= false
-        dniCuentaCajero.disabled= false
-        montoCuenta.disabled= false
+    numeroCuentaCajero.disabled = false
+    dniCuentaCajero.disabled = false
+    montoCuenta.disabled = false
 
-        formularioPersona.reset()
-   
+    formularioPersona.reset()
+
 })
 
 
@@ -63,7 +64,6 @@ document.addEventListener("click", e => {
 
     }
 
-    /////////////////
     if (e.target.dataset.boton === "retirar") {
         cajero.retirar()
     }
@@ -89,8 +89,6 @@ class Persona {
     get getDni() {
         return this.dni
     }
-
-
 }
 
 class CajeroAutomatico {
@@ -123,7 +121,7 @@ class CajeroAutomatico {
             }
         }
 
-        ui.pintarDepositoRealizado(montoCuent , numeroCuen)
+        ui.pintarDepositoRealizado(montoCuent, numeroCuen)
 
         ui.resetFormulario(formularioCajero)
 
@@ -157,13 +155,11 @@ class CajeroAutomatico {
         if (indice !== -1 && parseInt(montoCuentRe) < parseInt(arregloCajero[indice].montoInicial) && parseInt(montoCuentRe) > 0) {
 
             arregloCajero[indice].montoInicial = (parseInt(arregloCajero[indice].montoInicial) - parseInt(montoCuentRe))
-
             saldoTotal.value = arregloCajero[indice].montoInicial
-            console.log(saldoTotal);
-    
+            
         }
 
-        ui.pintarRetiroRealizado(montoCuentRe,numeroCuenRe)
+        ui.pintarRetiroRealizado(montoCuentRe, numeroCuenRe)
 
         ui.resetFormulario(formularioCajero)
         console.log(montoCuentRe);
@@ -176,14 +172,14 @@ class CajeroAutomatico {
     muestraClientes() {
         saveTemplateCuentas.textContent = ''
         const ui = new UI()
-        arregloCajero.forEach(item => {
-            ui.pintarCuentasCreadas(item)
-        })
 
+        if(localStorage.getItem("cuentas")){
+            cuentasLocal =JSON.parse(localStorage.getItem("cuentas")) 
+            cuentasLocal.forEach(item => {
+                ui.pintarCuentasCreadas(item)
+            })  
+        }
     }
-
-
-
 }
 
 class UI {
@@ -239,22 +235,22 @@ class UI {
 
     }
 
-    resetFormulario( selector) {
+    resetFormulario(selector) {
         selector.reset()
     }
 
-    pintarDepositoRealizado(montoIngresado , numeroCuentaIngresado){
+    pintarDepositoRealizado(montoIngresado, numeroCuentaIngresado) {
         mensajeDeposito.classList.remove('d-none')
-        mensajeDeposito.textContent=`Se deposito la cantidad $${montoIngresado} al numero de cuenta ${numeroCuentaIngresado}`
+        mensajeDeposito.textContent = `Se deposito la cantidad $${montoIngresado} al numero de cuenta ${numeroCuentaIngresado}`
         setTimeout(() => {
             mensajeDeposito.classList.add('d-none')
         }, 1500);
     }
 
-    pintarRetiroRealizado(montoIngresadoR , numeroCuentaIngresadoR){
+    pintarRetiroRealizado(montoIngresadoR, numeroCuentaIngresadoR) {
         console.log(mensajeRetiro);
         mensajeRetiro.classList.remove('d-none')
-        mensajeRetiro.textContent=`Se retiro la cantidad $${montoIngresadoR} al numero de cuenta ${numeroCuentaIngresadoR}`
+        mensajeRetiro.textContent = `Se retiro la cantidad $${montoIngresadoR} al numero de cuenta ${numeroCuentaIngresadoR}`
 
         setTimeout(() => {
             mensajeRetiro.classList.add('d-none')
