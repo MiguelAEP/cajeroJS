@@ -27,7 +27,14 @@ let arregloPersona = []
 let arregloCajero = []
 let cuentasLocal = []
 
-
+document.addEventListener('DOMContentLoaded' , e=>{
+    if(localStorage.getItem("cuentas")){
+        cuentasLocal = JSON.parse(localStorage.getItem("cuentas")) 
+        console.log(cuentasLocal);
+        muestraClientes()
+    }
+})
+ 
 formularioPersona.addEventListener("submit", e => {
     e.preventDefault()
     const ui = new UI()
@@ -41,7 +48,7 @@ formularioPersona.addEventListener("submit", e => {
     arregloPersona.push(persona)
     ui.pintarMensajeRegistro(persona)
 
-    localStorage.setItem("cuentas", JSON.stringify(arregloPersona))
+    
 
     const cajero = new CajeroAutomatico()
     cajero.almacenaCliente(persona)
@@ -207,6 +214,8 @@ class UI {
     }
 
     pintarMensajeRegistro(persona) {
+        localStorage.setItem("cuentas", JSON.stringify(arregloPersona))
+
         divRegistro.textContent = ''
         divRegistro.classList.remove('d-none')
         const clone = templateRegistroPersona.content.cloneNode(true)
